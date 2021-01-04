@@ -69,7 +69,7 @@ const bedrockPhantom = (tests, auto) => {
   }
 };
 
-const bedrockBrowser = (tests, browserName, osName, bucket, buckets, auto) => {
+const bedrockBrowser = (tests, browserName, osName, bucket, buckets, chunk, auto) => {
   if (tests.length === 0) {
     return {};
   } else {
@@ -82,6 +82,7 @@ const bedrockBrowser = (tests, browserName, osName, bucket, buckets, auto) => {
         testfiles: testFolders(tests, auto),
         bucket: bucket,
         buckets: buckets,
+        chunk: chunk,
 
         // we have a few tests that don't play nicely when combined together in the monorepo
         retries: 3
@@ -126,6 +127,7 @@ module.exports = function (grunt) {
 
   const bucket = grunt.option('bucket') || 1;
   const buckets = grunt.option('buckets') || 1;
+  const chunk = grunt.option('chunk') || 100;
 
   const phantomTests = filterChanges(changes, runsInPhantom);
   const browserTests = filterChangesNot(changes, runsInPhantom);
@@ -141,11 +143,11 @@ module.exports = function (grunt) {
     },
     'bedrock-auto': {
       ...bedrockPhantom(phantomTests, true),
-      ...bedrockBrowser(browserTests, activeBrowser, activeOs, bucket, buckets, true)
+      ...bedrockBrowser(browserTests, activeBrowser, activeOs, bucket, buckets, chunk, true)
     },
     'bedrock-manual': {
       ...bedrockPhantom(phantomTests, false),
-      ...bedrockBrowser(browserTests, activeBrowser, activeOs, bucket, buckets, false)
+      ...bedrockBrowser(browserTests, activeBrowser, activeOs, bucket, buckets, chunk, false)
     }
   };
 
